@@ -34,7 +34,7 @@ Module.register("emailParser",{
 
 	// Define start sequence.
 	start: function() {
-		Log.info("Starting main module: " + this.name);
+		console.log("Starting main module: " + this.name);
 
 		// Set locale.
 		moment.locale(config.language);

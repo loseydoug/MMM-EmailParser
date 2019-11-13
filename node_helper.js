@@ -13,6 +13,7 @@ module.exports = NodeHelper.create({
 	start: function() {
 		console.log("Starting helper module: " + this.name);
 		this.fetchers = [];
+		console.log("fetch", this.fetchers)
 	},
 
 	// Subclass socketNotificationReceived received.
