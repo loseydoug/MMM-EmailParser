@@ -8,6 +8,7 @@ var Imap = require('imap');
  */
 
 var Fetcher = function(reloadInterval, encoding, account) {
+	console.log("Create new email fetcher for account: " + account.user);
 	var self = this;
 	if (reloadInterval < 1000) {
 		reloadInterval = 1000;
@@ -20,7 +21,7 @@ var Fetcher = function(reloadInterval, encoding, account) {
 	var itemsReceivedCallback = function() {};
 
 	// host gmail
-	const imap = new Imap();
+	var imap = new Imap();
 	/* private methods */
 
 	/* fetchMail()
@@ -46,8 +47,8 @@ var Fetcher = function(reloadInterval, encoding, account) {
 						console.log(err1);
 					}
 					try {
-						// const f = imap.fetch(results, { bodies: 'TEXT' });
-						const f = imap.fetch(results, {
+						// var f = imap.fetch(results, { bodies: 'TEXT' });
+						var f = imap.fetch(results, {
 							bodies: '', // “[\'HEADER.FIELDS (FROM TO SUBJECT DATE)\', '']”,
 							struct: true,
 						});
@@ -59,7 +60,7 @@ var Fetcher = function(reloadInterval, encoding, account) {
 										this.emit(EXECUTOR_EVENTS.STOPPED, { reason: END_REASON.ERROR, error: err2 });
 									}
 
-									const emailEnvolope = {};
+									var emailEnvolope = {};
 									emailEnvolope.from = mail.from.text;
 									emailEnvolope.date = mail.date;
 									emailEnvolope.to = mail.to.text;
@@ -73,7 +74,7 @@ var Fetcher = function(reloadInterval, encoding, account) {
 							});
 							msg.once('attributes', (attrs) => {
 								// Mark the above mails as read
-								const { uid } = attrs;
+								var { uid } = attrs;
 								imap.addFlags(uid, ['\\Seen'], (err2) => {
 									if (err2) {
 										log(err2);
@@ -103,13 +104,13 @@ var Fetcher = function(reloadInterval, encoding, account) {
 		}); // close ready
 		// if error occurs in connection making
 		imap.once('error', (err) => {
-			log(err);
-			log('Read mail executor error …..');
+			console.log(err);
+			console.log('Read mail executor error …..');
 			this.emit(EXECUTOR_EVENTS.STOPPED, { reason: END_REASON.ERROR });
 		});
 		// Once it ends
 		imap.once('end', () => {
-			log('Read mail executor finished …..');
+			console.log('Read mail executor finished …..');
 			this.emit(EXECUTOR_EVENTS.STOPPED, { reason: END_REASON.COMPLETE });
 		});
 		// initiating connection

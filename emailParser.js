@@ -65,7 +65,7 @@ Module.register("emailParser",{
 
 	// Override dom generator.
 	getDom: function() {
-		const wrapper = document.createElement("div");
+		var wrapper = document.createElement("div");
 
 		if (this.config.feedUrl) {
 			wrapper.className = "small bright";
@@ -81,7 +81,7 @@ Module.register("emailParser",{
 
 			// this.config.showTimestamp is a run-time configuration, triggered by optional notifications
 			if (this.config.showTimestamp) {
-				const timestamp = document.createElement("div");
+				var timestamp = document.createElement("div");
 				timestamp.className = "newsfeed-source light small dimmed";
 				timestamp.innerHTML += moment(new Date(this.emails[this.activeItem].date)).fromNow();
 
