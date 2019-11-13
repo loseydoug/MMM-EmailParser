@@ -9,7 +9,6 @@ var NodeHelper = require("node_helper");
 var Fetcher = require("./fetcher.js");
 
 module.exports = NodeHelper.create({
-	console.log('in node helper')
 	// Subclass start method.
 	start: function() {
 		console.log("Starting module: " + this.name);
@@ -39,26 +38,21 @@ module.exports = NodeHelper.create({
 		var reloadInterval = feed.reloadInterval || config.reloadInterval || 5 * 60 * 1000;
 
 		var fetcher;
-		if (typeof self.fetchers[url] === "undefined") {
-			fetcher = new Fetcher(reloadInterval, encoding, account);
+		fetcher = new Fetcher(reloadInterval, encoding, account);
 
-			fetcher.onReceive(function(fetcher) {
-				self.broadcastFeeds(email);
+		fetcher.onReceive(function(fetcher) {
+			self.broadcastFeeds(email);
+		});
+
+		fetcher.onError(function(fetcher, error) {
+			self.sendSocketNotification("FETCH_ERROR", {
+				url: fetcher.url(),
+				error: error
 			});
+		});
 
-			fetcher.onError(function(fetcher, error) {
-				self.sendSocketNotification("FETCH_ERROR", {
-					url: fetcher.url(),
-					error: error
-				});
-			});
+		self.fetchers[account.user] = fetcher;
 
-			self.fetchers[url] = fetcher;
-		} else {
-			console.log("Use existing news fetcher for url: " + url);
-			fetcher.setReloadInterval(reloadInterval);
-			fetcher.broadcastItems();
-		}
 
 		fetcher.startFetch();
 	},
