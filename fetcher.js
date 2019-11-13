@@ -1,5 +1,5 @@
-import { simpleParser } from 'mailparser';
-import Imap from 'imap';
+var simpleParser =  require('mailparser').simpleParser;
+var Imap = require('imap');
 
 /* Fetcher
  * Responsible for requesting an update on the set interval and broadcasting the data.
