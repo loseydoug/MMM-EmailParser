@@ -8,7 +8,6 @@
  */
 
 Module.register("emailParser",{
-
 	// Default module config.
 	defaults: {
 		showTimestamp: true,
@@ -20,6 +19,7 @@ Module.register("emailParser",{
 		scrollLength: 500
 	},
 
+	console.log('in email parser');
 	// Define required scripts.
 	getScripts: function() {
 		return ["moment.js"];

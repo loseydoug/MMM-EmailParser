@@ -9,6 +9,7 @@ var NodeHelper = require("node_helper");
 var Fetcher = require("./fetcher.js");
 
 module.exports = NodeHelper.create({
+	console.log('in node helper')
 	// Subclass start method.
 	start: function() {
 		console.log("Starting module: " + this.name);
