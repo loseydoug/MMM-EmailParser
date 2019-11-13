@@ -17,8 +17,9 @@ module.exports = NodeHelper.create({
 
 	// Subclass socketNotificationReceived received.
 	socketNotificationReceived: function(notification, payload) {
+		console.log(payload)
 		if (notification === "ADD_FEED") {
-			this.createFetcher(payload.feed, payload.config);
+			this.createFetcher(payload.account, payload.config);
 			return;
 		}
 	},

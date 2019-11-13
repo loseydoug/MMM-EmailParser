@@ -8,7 +8,6 @@ var Imap = require('imap');
  */
 
 var Fetcher = function(reloadInterval, encoding, account) {
-	console.log("Create new email fetcher for account: " + account.user);
 	var self = this;
 	if (reloadInterval < 1000) {
 		reloadInterval = 1000;
@@ -29,6 +28,7 @@ var Fetcher = function(reloadInterval, encoding, account) {
 	 */
 
 	var fetchMail = function() {
+		console.log("Create new email fetcher for account: " + account.user);
 		clearTimeout(reloadTimer);
 		reloadTimer = null;
 		items = [];

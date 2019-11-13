@@ -124,19 +124,20 @@ Module.register("emailParser",{
 	 */
 	generateFeed: function(accounts) {
 		var emails = [];
+		console.log(accounts)
 		accounts.forEach(account => {
 			account.forEach(item => {
-				Log.info(item)
-				item.sourceTitle = this.titleForFeed(feed);
-				if (!(this.config.ignoreOldItems && ((Date.now() - new Date(item.pubdate)) > this.config.ignoreOlderThan))) {
+				og.info(item)
+				item.sourceTitle = this.titleForFeed(item);
+				if (!(this.config.ignoreOldItems && ((Date.now() - new Date(item.date)) > this.config.ignoreOlderThan))) {
 					emails.push(item);
 				}
 			}
 		})
 
 		emails.sort(function(a,b) {
-			var dateA = new Date(a.pubdate);
-			var dateB = new Date(b.pubdate);
+			var dateA = new Date(a.date);
+			var dateB = new Date(b.date);
 			return dateB - dateA;
 		});
 
