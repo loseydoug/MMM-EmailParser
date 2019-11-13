@@ -19,7 +19,6 @@ Module.register("emailParser",{
 		scrollLength: 500
 	},
 
-	console.log('in email parser');
 	// Define required scripts.
 	getScripts: function() {
 		return ["moment.js"];
