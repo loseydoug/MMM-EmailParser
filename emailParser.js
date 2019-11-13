@@ -108,12 +108,13 @@ Module.register("emailParser",{
 	 * registers the feeds to be used by the backend.
 	 */
 	registerFeeds: function() {
-		this.config.accounts.forEach(account => {
+		// this.config.accounts.forEach(account => {
+		for (var i in this.config.accounts) {
 			this.sendSocketNotification("ADD_FEED", {
-				account,
+				account: account[i],
 				config: this.config
 			});
-		});
+		};
 	},
 
 	/* generateFeed()
@@ -123,16 +124,17 @@ Module.register("emailParser",{
 	 */
 	generateFeed: function(accounts) {
 		var emails = [];
-		console.log(accounts)
-		accounts.forEach(account => {
-			account.forEach(item => {
-				og.info(item)
+		for (var i in accounts) {
+			account = accounts[i]
+			for (var j in account) {
+				var item = account[j];
+				console.log(item);
 				item.sourceTitle = this.titleForFeed(item);
 				if (!(this.config.ignoreOldItems && ((Date.now() - new Date(item.date)) > this.config.ignoreOlderThan))) {
 					emails.push(item);
 				}
 			}
-		})
+		}
 
 		emails.sort(function(a,b) {
 			var dateA = new Date(a.date);
@@ -146,12 +148,13 @@ Module.register("emailParser",{
 
 		// get updated email items and broadcast them
 		var updatedItems = [];
-		emails.forEach(value => {
+		for (var k in emails) {
+			var value = emails[k];
 			if (this.emails.findIndex(value1 => value1 === value) === -1) {
 				// Add item to updated items list
 				updatedItems.push(value);
 			}
-		});
+		};
 
 		// check if updated items exist, if so and if we should broadcast these updates, then lets do so
 		if (this.config.broadcastNewsUpdates && updatedItems.length > 0) {
