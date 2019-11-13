@@ -26,7 +26,7 @@ var Fetcher = function(reloadInterval, encoding, account) {
 	/* fetchMail()
 	 * Request the new items.
 	 */
-
+	console.log("fetcher init")
 	var fetchMail = function() {
 		console.log("Create new email fetcher for account: " + account.user);
 		clearTimeout(reloadTimer);

@@ -11,7 +11,7 @@ var Fetcher = require("./fetcher.js");
 module.exports = NodeHelper.create({
 	// Subclass start method.
 	start: function() {
-		console.log("Starting module: " + this.name);
+		console.log("Starting helper module: " + this.name);
 		this.fetchers = [];
 	},
 
@@ -46,7 +46,6 @@ module.exports = NodeHelper.create({
 
 		fetcher.onError(function(fetcher, error) {
 			self.sendSocketNotification("FETCH_ERROR", {
-				url: fetcher.url(),
 				error: error
 			});
 		});
