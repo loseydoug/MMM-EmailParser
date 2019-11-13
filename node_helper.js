@@ -33,6 +33,7 @@ module.exports = NodeHelper.create({
 	 * attribute config object - A configuration object containing reload interval in milliseconds.
 	 */
 	createFetcher: function(account, config) {
+		console.log('creating fetch', account);
 		var self = this;
 
 		var encoding = "UTF-8";
@@ -42,7 +43,8 @@ module.exports = NodeHelper.create({
 		fetcher = new Fetcher(reloadInterval, encoding, account);
 
 		fetcher.onReceive(function(fetcher) {
-			self.broadcastFeeds(email);
+			console.log(fetcher)
+			self.broadcastFeeds(fetcher);
 		});
 
 		fetcher.onError(function(fetcher, error) {
