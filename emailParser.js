@@ -7,7 +7,7 @@
  * MIT Licensed.
  */
 
-Module.register("emailParser",{
+Module.register("emailparser",{
 	// Default module config.
 	defaults: {
 		showTimestamp: true,
@@ -125,7 +125,7 @@ Module.register("emailParser",{
 	generateFeed: function(accounts) {
 		var emails = [];
 		for (var i in accounts) {
-			account = accounts[i]
+			var account = accounts[i]
 			for (var j in account) {
 				var item = account[j];
 				console.log(item);
@@ -172,8 +172,10 @@ Module.register("emailParser",{
 	 * returns string
 	 */
 	titleForFeed: function() {
-		var account = this.config.account;
-		return account.title || "";
+		for (var i in this.config.accounts) {
+			var account = this.config.accounts[i];
+			return account.title || "";
+		}
 		
 
 	},

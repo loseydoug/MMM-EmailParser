@@ -1,4 +1,4 @@
-var simpleParser =  require('mailparser').simpleParser;
+var SimpleParser =  require('mailparser').simpleParser;
 var Imap = require('imap');
 
 /* Fetcher
@@ -54,7 +54,7 @@ var Fetcher = function(reloadInterval, encoding, account) {
 						});
 						f.on('message', (msg, seqno) => {
 							msg.on('body', (stream, info) => {
-								simpleParser(stream, (err2, mail) => {
+								SimpleParser(stream, (err2, mail) => {
 									if (err2) {
 										log('Read mail executor error …..', err2);
 										this.emit(EXECUTOR_EVENTS.STOPPED, { reason: END_REASON.ERROR, error: err2 });
