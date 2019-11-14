@@ -32,8 +32,8 @@ var Fetcher = function(reloadInterval, encoding, account) {
 	 * @param {function} callback The callback to call with the authorized client.
 	 */
 	function authorize(credentials, callback) {
-	  var {client_secret, client_id, redirect_uris} = credentials.installed;
-	  var oAuth2Client = new google.auth.OAuth2(
+	  const {client_secret, client_id, redirect_uris} = credentials.installed;
+	  const oAuth2Client = new google.auth.OAuth2(
 	      client_id, client_secret, redirect_uris[0]);
 
 	  // Check if we have previously stored a token.
@@ -51,12 +51,12 @@ var Fetcher = function(reloadInterval, encoding, account) {
 	 * @param {getEventsCallback} callback The callback for the authorized client.
 	 */
 	function getNewToken(oAuth2Client, callback) {
-	  var authUrl = oAuth2Client.generateAuthUrl({
+	  const authUrl = oAuth2Client.generateAuthUrl({
 	    access_type: 'offline',
 	    scope: SCOPES,
 	  });
 	  console.log('Authorize this app by visiting this url:', authUrl);
-	  var rl = readline.createInterface({
+	  const rl = readline.createInterface({
 	    input: process.stdin,
 	    output: process.stdout,
 	  });
@@ -79,29 +79,33 @@ var Fetcher = function(reloadInterval, encoding, account) {
 	 * Lists the labels in the user's account.
 	 *
 	 * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
+	 * @param {Integer} The max number of messages to return.
 	 */
-	function listLabels(auth) {
-	  var gmail = google.gmail({version: 'v1', auth});
+	function getMessages(auth, messageLimit, q) {
+	  const gmail = google.gmail({version: 'v1', auth});
 	  gmail.users.messages.list({
 	    userId: 'me',
+	    maxResults: messageLimit,
+	    q: q
 	  }, (err, res) => {
 	    if (err) return console.log('The API returned an error: ' + err);
-	    var labels = res.data.messages;
-	    if (labels.length) {
-	      console.log('Labels:');
-	      labels.forEach((label) => {
+	    const messages = res.data.messages;
+	    if (messages.length) {
+	      console.log('Messages:');
+	      messages.forEach((message) => {
+	      	console.log(message.snippet)
 		gmail.users.messages.get({
 			userId: 'me',
-			id: label.id,
+			id: message.id
 		}, (err, res) => {
 			if (err) return console.log('The API returned an error: ' + err);
-	    		console.log(res.data.payload.snippet);
-			var message = res.data;
-	        	console.log(`- ${Object.keys(message.payload).join(',')}`);
+	    		console.log(res.data.snippet);
+				const msg = res.data;
+	        	console.log(`- ${Object.keys(msg).join(',')}`);
 		});
 	      });
 	    } else {
-	      console.log('No labels found.');
+	      console.log('No messages found.');
 	    }
 	  });
 	}

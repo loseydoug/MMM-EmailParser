@@ -5,8 +5,8 @@
  * MIT Licensed.
  */
 
-var NodeHelper = require("node_helper");
-var Fetcher = require("./fetcher.js");
+const NodeHelper = require("node_helper");
+const Fetcher = require("./fetcher.js");
 
 module.exports = NodeHelper.create({
 	// Subclass start method.
@@ -33,12 +33,12 @@ module.exports = NodeHelper.create({
 	 * attribute config object - A configuration object containing reload interval in milliseconds.
 	 */
 	createFetcher: function(account, config) {
-		var self = this;
+		const self = this;
 
-		var encoding = "UTF-8";
-		var reloadInterval = account.reloadInterval || config.reloadInterval || 5 * 60 * 1000;
+		const encoding = "UTF-8";
+		const reloadInterval = account.reloadInterval || config.reloadInterval || 5 * 60 * 1000;
 
-		var fetcher;
+		let fetcher;
 		fetcher = new Fetcher(reloadInterval, encoding, account);
 
 		fetcher.onReceive(function(fetcher) {
