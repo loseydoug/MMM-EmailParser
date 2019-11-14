@@ -57,7 +57,7 @@ var Fetcher = function(reloadInterval, encoding, account) {
 								SimpleParser(stream, (err2, mail) => {
 									if (err2) {
 										log('Read mail executor error …..', err2);
-										this.emit(EXECUTOR_EVENTS.STOPPED, { reason: END_REASON.ERROR, error: err2 });
+										// this.emit(EXECUTOR_EVENTS.STOPPED, { reason: END_REASON.ERROR, error: err2 });
 									}
 
 									var emailEnvolope = {};
@@ -93,11 +93,11 @@ var Fetcher = function(reloadInterval, encoding, account) {
 						if (errorWhileFetching.message === 'Nothing to fetch') {
 							log('no mails fetched, temp directory not created');
 							log('Read mail executor finished …..');
-							this.emit(EXECUTOR_EVENTS.STOPPED, { reason: END_REASON.COMPLETE });
+							// this.emit(EXECUTOR_EVENTS.STOPPED, { reason: END_REASON.COMPLETE });
 							imap.end();
 						}
 						imap.end();
-						this.emit(EXECUTOR_EVENTS.STOPPED, { reason: END_REASON.ERROR });
+						// this.emit(EXECUTOR_EVENTS.STOPPED, { reason: END_REASON.ERROR });
 					}
 				});
 			}); // close open mailbox
@@ -106,12 +106,12 @@ var Fetcher = function(reloadInterval, encoding, account) {
 		imap.once('error', (err) => {
 			console.log(err);
 			console.log('Read mail executor error …..');
-			this.emit(EXECUTOR_EVENTS.STOPPED, { reason: END_REASON.ERROR });
+			// this.emit(EXECUTOR_EVENTS.STOPPED, { reason: END_REASON.ERROR });
 		});
 		// Once it ends
 		imap.once('end', () => {
 			console.log('Read mail executor finished …..');
-			this.emit(EXECUTOR_EVENTS.STOPPED, { reason: END_REASON.COMPLETE });
+			// this.emit(EXECUTOR_EVENTS.STOPPED, { reason: END_REASON.COMPLETE });
 		});
 		// initiating connection
 		imap.connect();
