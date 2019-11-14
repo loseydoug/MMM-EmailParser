@@ -66,12 +66,6 @@ Module.register("emailparser",{
 	getDom: function() {
 		var wrapper = document.createElement("div");
 
-		if (this.config.feedUrl) {
-			wrapper.className = "small bright";
-			wrapper.innerHTML = this.translate("configuration_changed");
-			return wrapper;
-		}
-
 		if (this.activeItem >= this.emails.length) {
 			this.activeItem = 0;
 		}
@@ -111,7 +105,7 @@ Module.register("emailparser",{
 		// this.config.accounts.forEach(account => {
 		for (var i in this.config.accounts) {
 			this.sendSocketNotification("ADD_FEED", {
-				account: account[i],
+				account: this.config.accounts[i],
 				config: this.config
 			});
 		};

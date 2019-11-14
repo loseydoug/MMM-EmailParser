@@ -1,6 +1,8 @@
 var SimpleParser =  require('mailparser').simpleParser;
-var Imap = require('imap-simple');
+var Imap = require('imap');
 var google = require('googleapis').google;
+var fs = require('fs');
+var readline = require('readline');
 /* Fetcher
  * Responsible for requesting an update on the set interval and broadcasting the data.
  *
@@ -16,7 +18,7 @@ var Fetcher = function(reloadInterval, encoding, account) {
 	var TOKEN_PATH = 'token.json';
 
 	// Load client secrets from a local file.
-	fs.readFile('credentials.json', (err, content) => {
+	fs.readFile('./modules/emailparser/credentials.json', (err, content) => {
 	  if (err) return console.log('Error loading client secret file:', err);
 	  // Authorize a client with credentials, then call the Gmail API.
 	  authorize(JSON.parse(content), listLabels);
@@ -80,15 +82,23 @@ var Fetcher = function(reloadInterval, encoding, account) {
 	 */
 	function listLabels(auth) {
 	  var gmail = google.gmail({version: 'v1', auth});
-	  gmail.users.labels.list({
+	  gmail.users.messages.list({
 	    userId: 'me',
 	  }, (err, res) => {
 	    if (err) return console.log('The API returned an error: ' + err);
-	    var labels = res.data.labels;
+	    var labels = res.data.messages;
 	    if (labels.length) {
 	      console.log('Labels:');
 	      labels.forEach((label) => {
-	        console.log(`- ${label.name}`);
+		gmail.users.messages.get({
+			userId: 'me',
+			id: label.id,
+		}, (err, res) => {
+			if (err) return console.log('The API returned an error: ' + err);
+	    		console.log(res.data.payload.snippet);
+			var message = res.data;
+	        	console.log(`- ${Object.keys(message.payload).join(',')}`);
+		});
 	      });
 	    } else {
 	      console.log('No labels found.');
@@ -117,13 +127,16 @@ var Fetcher = function(reloadInterval, encoding, account) {
 	console.log("fetcher init")
 	var fetchMail = function() {
 		console.log("Create new email fetcher for account: " + account.user);
+		console.log(account)
 		clearTimeout(reloadTimer);
 		reloadTimer = null;
 		items = [];
 
 		//Once the mail box is read to open
 		imap.once('ready', () => {
+
 			console.log("inbox ready")
+
 			imap.openBox('INBOX', false, (err, box) => {
 				if (err) {
 					console.log(err);
