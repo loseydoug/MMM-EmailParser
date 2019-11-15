@@ -21,7 +21,7 @@ var Fetcher = function(reloadInterval, encoding, account) {
 	fs.readFile('./modules/emailparser/credentials.json', (err, content) => {
 	  if (err) return console.log('Error loading client secret file:', err);
 	  // Authorize a client with credentials, then call the Gmail API.
-	  authorize(JSON.parse(content), listLabels);
+	  authorize(JSON.parse(content), getMessages);
 	});
 
 
@@ -86,24 +86,15 @@ var Fetcher = function(reloadInterval, encoding, account) {
 	  gmail.users.messages.list({
 	    userId: 'me',
 	    maxResults: messageLimit,
-	    q: q
+	    q: "from:losey.doug@gmail.com"
 	  }, (err, res) => {
 	    if (err) return console.log('The API returned an error: ' + err);
 	    const messages = res.data.messages;
 	    if (messages.length) {
-	      console.log('Messages:');
-	      messages.forEach((message) => {
-	      	console.log(message.snippet)
-		gmail.users.messages.get({
-			userId: 'me',
-			id: message.id
-		}, (err, res) => {
-			if (err) return console.log('The API returned an error: ' + err);
-	    		console.log(res.data.snippet);
-				const msg = res.data;
-	        	console.log(`- ${Object.keys(msg).join(',')}`);
+	      const snippets = messages.map(message =>{
+			return message.snippet
 		});
-	      });
+		this.broadcastItems(snippets);
 	    } else {
 	      console.log('No messages found.');
 	    }
@@ -251,7 +242,7 @@ var Fetcher = function(reloadInterval, encoding, account) {
 	 * Initiate fetchMail();
 	 */
 	this.startFetch = function() {
-		fetchMail();
+		authorize();
 	};
 
 	/* broadcastItems()

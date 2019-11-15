@@ -104,10 +104,10 @@ Module.register("emailparser",{
 	registerFeeds: function() {
 		this.config.accounts.forEach(account => {
 			this.sendSocketNotification("ADD_FEED", {
-				account: this.config.accounts[i],
+				account: account,
 				config: this.config
 			});
-		};
+		});
 	},
 
 	/* generateFeed()
