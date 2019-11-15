@@ -43,7 +43,7 @@ module.exports = NodeHelper.create({
 
 		fetcher.onReceive(function(fetcher) {
 			console.log(fetcher)
-			self.broadcastFeeds(email);
+			self.broadcastFeeds();
 		});
 
 		fetcher.onError(function(fetcher, error) {
@@ -62,7 +62,11 @@ module.exports = NodeHelper.create({
 	 * Creates an object with all feed items of the different registered feeds,
 	 * and broadcasts these using sendSocketNotification.
 	 */
-	broadcastFeeds: function(email) {
-		this.sendSocketNotification("NEW_MAIL", email);
+	broadcastFeeds: function() {
+		var feeds = {};
+		this.fetchers.forEach(fetcher => {
+			feeds[f] = this.fetchers[f].items();
+		}
+		this.sendSocketNotification("NEW_MAIL", feeds);
 	}
 });

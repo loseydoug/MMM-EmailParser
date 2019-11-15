@@ -134,7 +134,7 @@ Module.register("emailparser",{
 		});
 
 		if(this.config.maxEmails > 0) {
-			emails = emails.slice(0, this.config.maxEmails);
+			emails = emails.length = this.config.maxEmails
 		}
 
 		// get updated email items and broadcast them
