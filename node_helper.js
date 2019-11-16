@@ -13,12 +13,10 @@ module.exports = NodeHelper.create({
 	start: function() {
 		console.log("Starting helper module: " + this.name);
 		this.fetchers = [];
-		console.log("fetch", this.fetchers)
 	},
 
 	// Subclass socketNotificationReceived received.
 	socketNotificationReceived: function(notification, payload) {
-		console.log(payload)
 		if (notification === "ADD_FEED") {
 			this.createFetcher(payload.account, payload.config);
 			return;
@@ -34,26 +32,32 @@ module.exports = NodeHelper.create({
 	 */
 	createFetcher: function(account, config) {
 		const self = this;
-
+		let fetcher;
 		const encoding = "UTF-8";
 		const reloadInterval = account.reloadInterval || config.reloadInterval || 5 * 60 * 1000;
+		if (typeof self.fetchers[account.user] === "undefined") {
+			console.log("Create new news fetcher for account: " + account.user + " - Interval: " + reloadInterval);
+	
+			fetcher = new Fetcher(reloadInterval, encoding, account);
 
-		let fetcher;
-		fetcher = new Fetcher(reloadInterval, encoding, account);
-
-		fetcher.onReceive(function(fetcher) {
-			console.log(fetcher)
-			self.broadcastFeeds();
-		});
-
-		fetcher.onError(function(fetcher, error) {
-			self.sendSocketNotification("FETCH_ERROR", {
-				error: error
+			fetcher.onReceive(function(fetcher) {
+				self.broadcastFeeds();
 			});
-		});
 
-		self.fetchers[account.user] = fetcher;
+			fetcher.onError(function(fetcher, error) {
+				self.sendSocketNotification("FETCH_ERROR", {
+					error: error
+				});
+			});
 
+			self.fetchers.push(fetcher);
+
+		} else {
+			console.log("Use existing news fetcher for url: " + url);
+			fetcher = self.fetchers[url];
+			fetcher.setReloadInterval(reloadInterval);
+			fetcher.broadcastItems();
+		}
 
 		fetcher.startFetch();
 	},
@@ -63,10 +67,7 @@ module.exports = NodeHelper.create({
 	 * and broadcasts these using sendSocketNotification.
 	 */
 	broadcastFeeds: function() {
-		var feeds = {};
-		this.fetchers.forEach(fetcher => {
-			feeds[f] = this.fetchers[f].items();
-		}
+		const feeds = this.fetchers[0].items();
 		this.sendSocketNotification("NEW_MAIL", feeds);
 	}
 });

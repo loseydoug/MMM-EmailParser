@@ -93,6 +93,10 @@ Module.register("emailparser",{
 				wrapper.className = "small dimmed";
 			}
 		}
+		var title = document.createElement("div");
+		title.className = "newsfeed-title bright medium light" + (!this.config.wrapTitle ? " no-wrap" : "");
+		title.innerHTML = this.emails[this.activeItem];
+		wrapper.appendChild(title);
 
 		return wrapper;
 	},
@@ -115,23 +119,20 @@ Module.register("emailparser",{
 	 *
 	 * attribute feeds object - An object with feeds returned by the node helper.
 	 */
-	generateFeed: function(accounts) {
+	generateFeed: function(msgs) {
 		const emails = [];
-		this.config.accounts.forEach(account => {
-			account.forEach(item => {
-				console.log(item);
-				item.sourceTitle = this.titleForFeed(item);
-				if (!(this.config.ignoreOldItems && ((Date.now() - new Date(item.date)) > this.config.ignoreOlderThan))) {
-					emails.push(item);
-				}
-			})
+		msgs.forEach(item => {
+			//item.sourceTitle = this.titleForFeed(item);
+			if (!(this.config.ignoreOldItems && ((Date.now() - new Date(item.date)) > this.config.ignoreOlderThan))) {
+				emails.push(item);
+			}
 		})
 
-		emails.sort(function(a,b) {
-			const dateA = new Date(a.date);
-			const dateB = new Date(b.date);
-			return dateB - dateA;
-		});
+		//emails.sort(function(a,b) {
+		//	const dateA = new Date(a.date);
+		//	const dateB = new Date(b.date);
+		//	return dateB - dateA;
+		//});
 
 		if(this.config.maxEmails > 0) {
 			emails = emails.length = this.config.maxEmails

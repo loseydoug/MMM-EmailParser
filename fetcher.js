@@ -16,7 +16,7 @@ var Fetcher = function(reloadInterval, encoding, account) {
 
 	var reloadTimer = null;
 	let items = [];
-
+	let creds;
 	var fetchFailedCallback = function() {};
 	var itemsReceivedCallback = function() {};
 	// If modifying these scopes, delete token.json.
@@ -25,13 +25,6 @@ var Fetcher = function(reloadInterval, encoding, account) {
 	// created automatically when the authorization flow completes for the first
 	// time.
 	const TOKEN_PATH = 'token.json';
-	let cred;
-	// Load client secrets from a local file.
-	fs.readFile('./modules/emailparser/credentials.json', (err, content) => {
-		if (err) return console.log('Error loading client secret file:', err);
-		// Authorize a client with credentials, then call the Gmail API.
-		creds = JSON.parse(content);
-	});
 
 
 	/**
@@ -40,7 +33,7 @@ var Fetcher = function(reloadInterval, encoding, account) {
 	 * @param {Object} credentials The authorization client credentials.
 	 * @param {function} callback The callback to call with the authorized client.
 	 */
-	const authorize = (credentials, callback) => {
+	const authorize = async (credentials, callback) => {
 		const {client_secret, client_id, redirect_uris} = credentials.installed;
 		const oAuth2Client = new google.auth.OAuth2(
 			client_id, client_secret, redirect_uris[0]);
@@ -90,128 +83,36 @@ var Fetcher = function(reloadInterval, encoding, account) {
 	 * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
 	 * @param {Integer} The max number of messages to return.
 	 */
-	const getMessages = (auth, messageLimit, q) => {
+	const getMessages = (auth, max, query) => {
 		const gmail = google.gmail({version: 'v1', auth});
 	 	gmail.users.messages.list({
 		    userId: 'me',
-		    maxResults: messageLimit,
-		    q: "from:losey.doug@gmail.com"
+		maxResults: max,
+		q: query 
 		}, (err, res) => {
 		    if (err) return console.log('The API returned an error: ' + err);
 			    const messages = res.data.messages;
 			    if (messages.length) {
-					items = messages.map(message =>{
-					return message.snippet
+				const promises = messages.map(message => {
+					return new Promise((resolve, reject) => gmail.users.messages.get({
+					    userId: 'me',
+						id: message.id
+					}, (err, res) => {
+			    			if (err) return console.log('The API returned an error: ' + err);						
+						resolve(res.data.snippet);
+					}));
 				});
-				self.broadcastItems(snippets);
+
+				Promise.all(promises).then(values => {
+					items = values;
+					self.broadcastItems();
+				});
 		    } else {
 		      console.log('No messages found.');
 		    }
 		});
+		scheduleTimer();
 	}
-
-
-	// host gmail
-	// var imap = new Imap();
-	/* private methods */
-
-	/* fetchMail()
-	 * Request the new items.
-	 */
-	console.log("fetcher init")
-	// var fetchMail = function() {
-	// 	console.log("Create new email fetcher for account: " + account.user);
-	// 	console.log(account)
-	// 	clearTimeout(reloadTimer);
-	// 	reloadTimer = null;
-	// 	items = [];
-
-	// 	//Once the mail box is read to open
-	// 	imap.once('ready', () => {
-
-	// 		console.log("inbox ready")
-
-	// 		imap.openBox('INBOX', false, (err, box) => {
-	// 			if (err) {
-	// 				console.log(err);
-	// 			}
-	// 			// Search unseen emails having “hello world” in their Subject headers
-	// 			// imap.search(['UNSEEN', ['HEADER', 'SUBJECT',“hello world”]], (err1, results) => {
-	// 			imap.search(['UNSEEN'], (err1, results) => {
-
-	// 				if (err1) {
-	// 					console.log(err1);
-	// 				}
-	// 				try {
-	// 					// var f = imap.fetch(results, { bodies: 'TEXT' });
-	// 					var f = imap.fetch(results, {
-	// 						bodies: '', // “[\'HEADER.FIELDS (FROM TO SUBJECT DATE)\', '']”,
-	// 						struct: true,
-	// 					});
-	// 					f.on('message', (msg, seqno) => {
-	// 						msg.on('body', (stream, info) => {
-	// 							SimpleParser(stream, (err2, mail) => {
-	// 								if (err2) {
-	// 									log('Read mail executor error …..', err2);
-	// 									// this.emit(EXECUTOR_EVENTS.STOPPED, { reason: END_REASON.ERROR, error: err2 });
-	// 								}
-
-	// 								var emailEnvolope = {};
-	// 								emailEnvolope.from = mail.from.text;
-	// 								emailEnvolope.date = mail.date;
-	// 								emailEnvolope.to = mail.to.text;
-	// 								emailEnvolope.subject = mail.subject;
-	// 								emailEnvolope.text = mail.text;
-	// 								emailEnvolope.attachments = [];
-	// 								console.log(mail.text);
-
-	// 								log('processing mail done….');
-	// 							});
-	// 						});
-	// 						msg.once('attributes', (attrs) => {
-	// 							// Mark the above mails as read
-	// 							var { uid } = attrs;
-	// 							imap.addFlags(uid, ['\\Seen'], (err2) => {
-	// 								if (err2) {
-	// 									log(err2);
-	// 								} else {
-	// 									log('Marked as read!');
-	// 								}
-	// 							});
-	// 						});
-	// 					});
-
-	// 					f.once('end', () => {
-	// 						imap.end();
-	// 					});
-	// 				} catch (errorWhileFetching) {
-	// 					log(errorWhileFetching.message);
-	// 					if (errorWhileFetching.message === 'Nothing to fetch') {
-	// 						log('no mails fetched, temp directory not created');
-	// 						log('Read mail executor finished …..');
-	// 						// this.emit(EXECUTOR_EVENTS.STOPPED, { reason: END_REASON.COMPLETE });
-	// 						imap.end();
-	// 					}
-	// 					imap.end();
-	// 					// this.emit(EXECUTOR_EVENTS.STOPPED, { reason: END_REASON.ERROR });
-	// 				}
-	// 			});
-	// 		}); // close open mailbox
-	// 	}); // close ready
-	// 	// if error occurs in connection making
-	// 	imap.once('error', (err) => {
-	// 		console.log(err);
-	// 		console.log('Read mail executor error …..');
-	// 		// this.emit(EXECUTOR_EVENTS.STOPPED, { reason: END_REASON.ERROR });
-	// 	});
-	// 	// Once it ends
-	// 	imap.once('end', () => {
-	// 		console.log('Read mail executor finished …..');
-	// 		// this.emit(EXECUTOR_EVENTS.STOPPED, { reason: END_REASON.COMPLETE });
-	// 	});
-	// 	// initiating connection
-	// 	imap.connect();
-	// };
 
 	/* scheduleTimer()
 	 * Schedule the timer for the next update.
@@ -220,7 +121,7 @@ var Fetcher = function(reloadInterval, encoding, account) {
 	var scheduleTimer = function() {
 		clearTimeout(reloadTimer);
 		reloadTimer = setTimeout(function() {
-			fetchMail();
+			authorize(self.creds, getMessages);
 		}, reloadInterval);
 	};
 
@@ -241,7 +142,13 @@ var Fetcher = function(reloadInterval, encoding, account) {
 	 * Initiate fetchMail();
 	 */
 	this.startFetch = function() {
-		authorize(cred, getMessages);
+		// Load client secrets from a local file.
+		fs.readFile('./modules/emailparser/credentials.json', (err, content) => {
+			if (err) return console.log('Error loading client secret file:', err);
+			// Authorize a client with credentials, then call the Gmail API.
+			self.creds = JSON.parse(content);			
+			authorize(self.creds, getMessages);
+		});
 	};
 
 	/* broadcastItems()
