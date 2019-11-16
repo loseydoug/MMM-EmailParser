@@ -2,6 +2,8 @@ var SimpleParser =  require('mailparser').simpleParser;
 var google = require('googleapis').google;
 var fs = require('fs');
 var readline = require('readline');
+var moment = require('moment');
+
 /* Fetcher
  * Responsible for requesting an update on the set interval and broadcasting the data.
  *
@@ -87,8 +89,8 @@ var Fetcher = function(reloadInterval, encoding, account) {
 		const gmail = google.gmail({version: 'v1', auth});
 	 	gmail.users.messages.list({
 		    userId: 'me',
-		maxResults: max,
-		q: query 
+		maxResults: account.maxResults,
+		q: account.query
 		}, (err, res) => {
 		    if (err) return console.log('The API returned an error: ' + err);
 			    const messages = res.data.messages;
@@ -99,7 +101,7 @@ var Fetcher = function(reloadInterval, encoding, account) {
 						id: message.id
 					}, (err, res) => {
 			    			if (err) return console.log('The API returned an error: ' + err);						
-						resolve(res.data.snippet);
+						resolve({msg: res.data.snippet, date: moment(Number(res.data.internalDate))});
 					}));
 				});
 

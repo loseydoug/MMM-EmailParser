@@ -93,10 +93,10 @@ Module.register("emailparser",{
 				wrapper.className = "small dimmed";
 			}
 		}
-		var title = document.createElement("div");
-		title.className = "newsfeed-title bright medium light" + (!this.config.wrapTitle ? " no-wrap" : "");
-		title.innerHTML = this.emails[this.activeItem];
-		wrapper.appendChild(title);
+		var msg = document.createElement("div");
+		msg.className = "newsfeed-title bright medium light" + (!this.config.wrapTitle ? " no-wrap" : "");
+		msg.innerHTML = this.emails[this.activeItem].msg;
+		wrapper.appendChild(msg);
 
 		return wrapper;
 	},
@@ -122,17 +122,17 @@ Module.register("emailparser",{
 	generateFeed: function(msgs) {
 		const emails = [];
 		msgs.forEach(item => {
-			//item.sourceTitle = this.titleForFeed(item);
+			item.sourceTitle = this.titleForFeed(item);
 			if (!(this.config.ignoreOldItems && ((Date.now() - new Date(item.date)) > this.config.ignoreOlderThan))) {
 				emails.push(item);
 			}
 		})
 
-		//emails.sort(function(a,b) {
-		//	const dateA = new Date(a.date);
-		//	const dateB = new Date(b.date);
-		//	return dateB - dateA;
-		//});
+		emails.sort(function(a,b) {
+			const dateA = new Date(a.date);
+			const dateB = new Date(b.date);
+			return dateB - dateA;
+		});
 
 		if(this.config.maxEmails > 0) {
 			emails = emails.length = this.config.maxEmails
@@ -155,17 +155,14 @@ Module.register("emailparser",{
 		this.emails = emails;
 	},
 
-	/* titleForFeed(feedUrl)
-	 * Returns title for a specific feed Url.
+	/* titleForFeed()
 	 *
 	 * attribute feedUrl string - Url of the feed to check.
 	 *
 	 * returns string
 	 */
-	titleForFeed: function() {
-		this.config.accounts.forEach(account => {
-			return account.title || "";
-		});
+	titleForFeed: function(account) {
+		return account.title || "";
 	},
 
 	/* scheduleUpdateInterval()
