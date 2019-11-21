@@ -13,7 +13,7 @@ Module.register("emailparser",{
 		showTimestamp: true,
 		lengthDescription: 400,
 		hideLoading: false,
-		reloadInterval: 5 * 60 * 1000, // every 5 minutes
+		reloadInterval: 60000, //5 * 60 * 1000, // every 5 minutes
 		updateInterval: 10 * 1000,
 		animationSpeed: 2.5 * 1000,
 		scrollLength: 500
@@ -61,7 +61,7 @@ Module.register("emailparser",{
 			this.loaded = true;
 		}
 
-		if (notification === "READ_EMAIL" && this.hasUnreadEmail) {
+		if (notification === "EMAIL_READ" && this.hasUnread) {
 			this.sendNotification("UNREAD_EMAIL");
 		}
 	},
@@ -145,16 +145,20 @@ Module.register("emailparser",{
 		// get updated email items and broadcast them
 		const updatedItems = [];
 		emails.forEach(value => {
-			if (this.emails.findIndex(value1 => value1 === value) === -1) {
+			this.emails.findIndex(value1 => {
+				console.log('email compare:', value1, value);
+			})
+			if (this.emails.findIndex(value1 => value1.msg === value.msg) === -1) {
 				// Add item to updated items list
 				updatedItems.push(value);
 			}
 		});
 
 		// check if updated items exist, if so and if we should broadcast these updates, then lets do so
-		if (this.config.broadcastNewsUpdates && updatedItems.length > 0 && !this.hasUnread) {
+		if (this.config.broadcastNewsUpdates && updatedItems.length > 0 && this.hasUnread) {
 			console.log('send unread email');
 			this.sendNotification("UNREAD_EMAIL", {items: updatedItems});
+			this.hasUnread = true;
 		}
 
 		this.emails = emails;
