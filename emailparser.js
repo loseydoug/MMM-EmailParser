@@ -2,7 +2,7 @@
 
 /* Magic Mirror
  * Module: emailParser
- * 
+ *
  * Adapted from NewsFeed by Michael Teeuw http://michaelteeuw.nl
  * MIT Licensed.
  */
@@ -59,6 +59,10 @@ Module.register("emailparser",{
 			}
 
 			this.loaded = true;
+		}
+
+		if (notification === "READ_EMAIL" && this.hasUnreadEmail) {
+			this.sendNotification("UNREAD_EMAIL");
 		}
 	},
 
@@ -148,8 +152,9 @@ Module.register("emailparser",{
 		});
 
 		// check if updated items exist, if so and if we should broadcast these updates, then lets do so
-		if (this.config.broadcastNewsUpdates && updatedItems.length > 0) {
-			this.sendNotification("EMAIL_UPDATE", {items: updatedItems});
+		if (this.config.broadcastNewsUpdates && updatedItems.length > 0 && !this.hasUnread) {
+			console.log('send unread email');
+			this.sendNotification("UNREAD_EMAIL", {items: updatedItems});
 		}
 
 		this.emails = emails;
