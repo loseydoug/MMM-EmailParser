@@ -10,6 +10,7 @@ const Fetcher = require("./fetcher.js");
 const moment = require('moment');
 
 module.exports = NodeHelper.create({
+	startTime: 0,
 	// Subclass start method.
 	start: function() {
 		console.log("Starting helper module: " + this.name);
@@ -17,23 +18,28 @@ module.exports = NodeHelper.create({
 		this.buttonClicks = 0;
 	},
 
+	notificationReceived: function(notification, payload) {
+
+	},
+
 	// Subclass socketNotificationReceived received.
 	socketNotificationReceived: function(notification, payload) {
+
 		if (notification === "ADD_FEED") {
 			this.createFetcher(payload.account, payload.config);
 			return;
 		}
-
 		if (notification === "EMAIL_READ") {
 			if (this.buttonClicks === 0) {
 				this.buttonClicks++;
-				const startTime = moment();
-			} else if (this.buttonClicks > 3) {
+				this.startTime = moment();
+			} else if (this.buttonClicks < 3) {
 				this.buttonClicks++;
-			} else {
-				const endTime = moment();
-				console.log(moment.duration(endTime.diff(startTime).as('seconds'));
-				moment.duration(endTime.diff(startTime).as('seconds') < 3 ? exec('sudo shutdown -h now, null') : this.buttonClicks = 0;
+			} else if (this.buttonClicks === 3) {
+				this.endTime = moment();
+				console.log(moment.duration(this.endTime.diff(this.startTime).as('seconds')));
+				//exec('sudo shutdown -h now, null')
+				moment.duration(this.endTime.diff(this.startTime).as('seconds')) < 3 ?  console.log('shutdown') : this.buttonClicks = 0;
 			}
 		}
 	},

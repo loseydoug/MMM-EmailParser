@@ -49,6 +49,20 @@ Module.register("emailparser",{
 		this.isShowingDescription = this.config.showDescription;
 	},
 
+	// Override notification handler.
+	notificationReceived: function(notification, payload) {
+		if (notification === "EMAIL_READ") {
+			console.log("read")
+}
+		if (notification === "EMAIL_READ") {
+			this.sendSocketNotification("EMAIL_READ", true);
+ 			if (this.hasUnread) {
+				this.sendNotification("UNREAD_EMAIL", true);
+			}
+
+		}
+	},
+
 	// Override socket notification handler.
 	socketNotificationReceived: function(notification, payload) {
 		if (notification === "NEW_MAIL") {
@@ -59,10 +73,6 @@ Module.register("emailparser",{
 			}
 
 			this.loaded = true;
-		}
-
-		if (notification === "EMAIL_READ" && this.hasUnread) {
-			this.sendNotification("UNREAD_EMAIL");
 		}
 	},
 
@@ -145,9 +155,6 @@ Module.register("emailparser",{
 		// get updated email items and broadcast them
 		const updatedItems = [];
 		emails.forEach(value => {
-			this.emails.findIndex(value1 => {
-				console.log('email compare:', value1, value);
-			})
 			if (this.emails.findIndex(value1 => value1.msg === value.msg) === -1) {
 				// Add item to updated items list
 				updatedItems.push(value);
@@ -155,7 +162,7 @@ Module.register("emailparser",{
 		});
 
 		// check if updated items exist, if so and if we should broadcast these updates, then lets do so
-		if (this.config.broadcastNewsUpdates && updatedItems.length > 0 && this.hasUnread) {
+		if (updatedItems.length > 0 && !this.hasUnread) {
 			console.log('send unread email');
 			this.sendNotification("UNREAD_EMAIL", {items: updatedItems});
 			this.hasUnread = true;

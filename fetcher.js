@@ -89,7 +89,7 @@ var Fetcher = function(reloadInterval, encoding, account) {
 		const gmail = google.gmail({version: 'v1', auth});
 	 	gmail.users.messages.list({
 		    userId: 'me',
-		maxResults: account.maxResults,
+		maxResults: account.maxEmails,
 		q: account.query
 		}, (err, res) => {
 		    if (err) return console.log('The API returned an error: ' + err);
