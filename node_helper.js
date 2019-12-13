@@ -18,29 +18,12 @@ module.exports = NodeHelper.create({
 		this.buttonClicks = 0;
 	},
 
-	notificationReceived: function(notification, payload) {
-
-	},
-
 	// Subclass socketNotificationReceived received.
 	socketNotificationReceived: function(notification, payload) {
 
 		if (notification === "ADD_FEED") {
 			this.createFetcher(payload.account, payload.config);
 			return;
-		}
-		if (notification === "EMAIL_READ") {
-			if (this.buttonClicks === 0) {
-				this.buttonClicks++;
-				this.startTime = moment();
-			} else if (this.buttonClicks < 3) {
-				this.buttonClicks++;
-			} else if (this.buttonClicks === 3) {
-				this.endTime = moment();
-				console.log(moment.duration(this.endTime.diff(this.startTime).as('seconds')));
-				//exec('sudo shutdown -h now, null')
-				moment.duration(this.endTime.diff(this.startTime).as('seconds')) < 3 ?  console.log('shutdown') : this.buttonClicks = 0;
-			}
 		}
 	},
 

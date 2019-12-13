@@ -51,15 +51,10 @@ Module.register("emailparser",{
 
 	// Override notification handler.
 	notificationReceived: function(notification, payload) {
-		if (notification === "EMAIL_READ") {
-			console.log("read")
-}
-		if (notification === "EMAIL_READ") {
-			this.sendSocketNotification("EMAIL_READ", true);
- 			if (this.hasUnread) {
-				this.sendNotification("UNREAD_EMAIL", true);
-			}
-
+	    console.log(this.hasUnread)
+		if (notification === "PLAY_SOUND" && this.hasUnread) {
+			this.sendNotification("UNREAD_EMAIL", true);
+			this.hasUnread = false;
 		}
 	},
 

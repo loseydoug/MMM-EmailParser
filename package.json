@@ -1,0 +1,24 @@
+{
+  "name": "Magic-Mirror-Module-Email-Parser",
+  "version": "1.0.0",
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ptrbld/MMM-Pins"
+  },
+  "keywords": [
+    "magic mirror",
+    "email parser",
+    "module"
+  ],
+  "author": "loseydoug",
+  "license": "MIT",
+  "dependencies": {
+    "googleapis": "^39.2.0",
+    "mailparser": "^2.7.6",
+    "onoff": "latest"
+  },
+  "devDependencies": {
+    "electron-rebuild": "^1.2.1"
+  }
+}
